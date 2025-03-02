@@ -74,8 +74,8 @@ for i in range(len(q3_choices)):
     else: # otherwise it does not apper 50% of the time so set vector value to 0
         choices_one_hot[choice] = 0
 
-print("Original DataFrame:")
-print(df)
+# print("Original DataFrame:")
+# print(df)
 
 # next fill in any value that are missing based on the one-hot vector above. Loop though the q3 clumn in the data frame and check each row
 for index, row in df["Q3: In what setting would you expect this food to be served? Please check all that apply"].items():
@@ -88,8 +88,8 @@ for index, row in df["Q3: In what setting would you expect this food to be serve
         df.at[index, 'At a party'] = choices_one_hot['At a party'] 
         df.at[index, 'Late night snack'] = choices_one_hot['Late night snack'] 
 
-print("\nDataFrame after filling missing values:")
-print(df)
+# print("\nDataFrame after filling missing values:")
+# print(df)
 
 # remove the data                
 df = df.drop("Q3: In what setting would you expect this food to be served? Please check all that apply", axis=1)
