@@ -19,7 +19,7 @@ import pickle as pk
 
 # Load the dataset
 data_path = './cleaned_data_combined.csv'
-clean_data = pd.read_csv(data_path)
+df = pd.read_csv(data_path)
 
 # options that can be chosen
 q3_choices = ['Week day lunch', 'Week day dinner', 'Weekend lunch', 'Weekend dinner','At a party', 'Late night snack']
@@ -27,11 +27,11 @@ q3_choices = ['Week day lunch', 'Week day dinner', 'Weekend lunch', 'Weekend din
 q3_options_count = [0,0,0,0,0,0]
 
 # split the data
-q3_clean = clean_data["Q3: In what setting would you expect this food to be served? Please check all that apply"].str.split(',')
+q3_clean = df["Q3: In what setting would you expect this food to be served? Please check all that apply"].str.split(',')
 
 # we are calcuating the mode so start all values at 0
 for c in q3_choices:
-    clean_data[c] = 0  
+    df[c] = 0  
 
 for i, choice in q3_clean.items():
     # skip missing values (if choice is null and if its equal)
@@ -47,7 +47,7 @@ for i, choice in q3_clean.items():
             # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
             for c in curr_i:
                 if c in q3_choices:
-                    clean_data[i, c] = 1
+                    df[i, c] = 1
                     if c == 'Week day lunch':
                         q3_options_count[0] += 1
                     elif c == 'Week day dinner':
@@ -62,7 +62,7 @@ for i, choice in q3_clean.items():
                         q3_options_count[5] += 1
 
 # next check to see if each choice is present more than 50% of the time and convert it into a vector
-half_length = len(clean_data) / 2
+half_length = len(df) / 2
 choices_one_hot = {}
 for i in range(len(q3_choices)):
     count = q3_options_count[i]
@@ -75,21 +75,21 @@ for i in range(len(q3_choices)):
         choices_one_hot[choice] = 0
 
 print("Original DataFrame:")
-print(clean_data)
+print(df)
 
 # next fill in any value that are missing based on the one-hot vector above. Loop though the q3 clumn in the data frame and check each row
-for index, row in clean_data["Q3: In what setting would you expect this food to be served? Please check all that apply"].items():
+for index, row in df["Q3: In what setting would you expect this food to be served? Please check all that apply"].items():
     if pd.isnull(row):
         # if the row is null fill it in based on the one-hot vector
-        clean_data.at[index, 'Week day lunch'] = choices_one_hot['Week day lunch'] 
-        clean_data.at[index, 'Week day dinner'] = choices_one_hot['Week day dinner'] 
-        clean_data.at[index, 'Weekend lunch'] = choices_one_hot['Weekend lunch']
-        clean_data.at[index, 'Weekend dinner'] = choices_one_hot['Weekend dinner'] 
-        clean_data.at[index, 'At a party'] = choices_one_hot['At a party'] 
-        clean_data.at[index, 'Late night snack'] = choices_one_hot['Late night snack'] 
+        df.at[index, 'Week day lunch'] = choices_one_hot['Week day lunch'] 
+        df.at[index, 'Week day dinner'] = choices_one_hot['Week day dinner'] 
+        df.at[index, 'Weekend lunch'] = choices_one_hot['Weekend lunch']
+        df.at[index, 'Weekend dinner'] = choices_one_hot['Weekend dinner'] 
+        df.at[index, 'At a party'] = choices_one_hot['At a party'] 
+        df.at[index, 'Late night snack'] = choices_one_hot['Late night snack'] 
 
 print("\nDataFrame after filling missing values:")
-print(clean_data)
+print(df)
 
 # remove the data                
-clean_data = clean_data.drop("Q3: In what setting would you expect this food to be served? Please check all that apply", axis=1)
+df = df.drop("Q3: In what setting would you expect this food to be served? Please check all that apply", axis=1)
