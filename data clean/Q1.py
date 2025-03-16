@@ -23,3 +23,5 @@ df['Q1: From a scale 1 to 5, how complex is it to make this food? (Where 1 is th
 # (Where 1 is the most simple, and 5 is the most complex)'
 # median_q1 = df[col_name].median()
 # df[col_name] = df[col_name].fillna(median_q1)
+
+df['Q1: From a scale 1 to 5, how complex is it to make this food? (Where 1 is the most simple, and 5 is the most complex)'].to_csv(clean_data_path, index=False)

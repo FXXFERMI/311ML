@@ -22,43 +22,29 @@ import pickle as pk
 data_path = './cleaned_data_combined.csv'
 df = pd.read_csv(data_path)
 
+cleaned_data_path = './clean data/Q7_clean.csv'
+
 # options that can be chosen
 q7_choices = ['Parents', 'Siblings', 'Friends', 'Teachers', 'Strangers']
 # this correcsponds to the number of times each option was chosen
 q7_options_count = [0,0,0,0,0]
 
 # split the data
-q7_clean = df["Q7: When you think about this food item, who does it remind you of?"].str.split(',')
+q7_clean = df["Q7: When you think about this food item, who does it remind you of?"].fillna('').str.split(',')
 
 # we are calcuating the mode so start all values at 0
 for c in q7_choices:
     df[c] = 0  
 
 for i, choice in q7_clean.items():
-    # skip missing values (if choice is null and if its equal)
-    if choice is not None and choice == choice:
-        # convert the str to a list for easier iteration
-        if isinstance(choice, str):
-            choice = [choice]
-        
-        # split the input by the ","
-        for i in range(len(choice)):
-            curr_i = choice[i].split(',')
-            
-            # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
-            for c in curr_i:
-                if c in q7_choices:
-                    df[i, c] = 1
-                    if c == 'Parents':
-                        q7_options_count[0] += 1
-                    elif c == 'Siblings':
-                        q7_options_count[1] += 1
-                    elif c == 'Friends':
-                        q7_options_count[2] += 1
-                    elif c == 'Teachers':
-                        q7_options_count[3] += 1
-                    elif c == 'Strangers':
-                        q7_options_count[4] += 1
+    # skip missing values (if choice is empty)
+    if choice:
+        # iterate through each choice
+        for c in choice:
+            c = c.strip()
+            if c in q7_choices:
+                df.at[i, c] = 1
+                q7_options_count[q7_choices.index(c)] += 1
 
 # next check to see if each choice is present more than 50% of the time and convert it into a vector
 half_length = len(df) / 2
@@ -91,3 +77,5 @@ for index, row in df["Q7: When you think about this food item, who does it remin
 
 # remove the data                
 df = df.drop("Q7: When you think about this food item, who does it remind you of?", axis=1)
+
+df[['Parents', 'Siblings', 'Friends', 'Teachers', 'Strangers']].to_csv(cleaned_data_path, index=False)

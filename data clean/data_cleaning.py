@@ -6,10 +6,17 @@ import pandas as pd
 
 #### Import Data ####
 # Load the dataset
-data_path = './cleaned_data_combined.csv'
+data_path = './dataset/train.csv'
 df = pd.read_csv(data_path)
 
 label_col = "Label" 
+
+clean_data_path = './dataset/train_dataset.csv'
+vocabQ2 = './dataset/vocabQ2.csv'
+vocabQ4 = './dataset/vocabQ4.csv'
+vocabQ5 = './dataset/vocabQ5.csv'
+vocabQ6 = './dataset/vocabQ6.csv'
+
 
 #####################################################################################################################
 #### Q1 ####
@@ -18,6 +25,26 @@ col_name = 'Q1: From a scale 1 to 5, how complex is it to make this food? \
 (Where 1 is the most simple, and 5 is the most complex)'
 median_q1 = df[col_name].median()
 df[col_name] = df[col_name].fillna(median_q1)
+
+# Compute mean and standard deviation
+mean_q1 = df[col_name].mean()
+std_q1 = df[col_name].std()
+
+# Apply Z-score normalization manually
+df[col_name] = (df[col_name] - mean_q1) / std_q1
+
+# Print first few rows
+# print(df[[col_name]].head())
+
+# # Compute min and max
+# min_q1 = df[col_name].min()
+# max_q1 = df[col_name].max()
+
+# # Apply Min-Max scaling manually
+# df[col_name] = (df[col_name] - min_q1) / (max_q1 - min_q1)
+
+# # Print first few rows
+# print(df[[col_name]].head())
 
 #####################################################################################################################
 #### Q2 ####
@@ -76,6 +103,16 @@ df[col_name] = df[col_name].apply(get_numbers)
 median_q2 = df[col_name].median()
 df[col_name] = df[col_name].fillna(median_q2)
 
+# Compute mean and standard deviation for Z-score normalization
+mean_q2 = df[col_name].mean()
+std_q2 = df[col_name].std()
+
+# Apply Z-score normalization manually
+df[col_name] = (df[col_name] - mean_q2) / std_q2
+
+# Print the first few rows to check the results
+# print(df[[col_name]].head())
+
 
 #####################################################################################################################
 #### Q3 ####
@@ -86,7 +123,7 @@ q3_choices = ['Week day lunch', 'Week day dinner', 'Weekend lunch', 'Weekend din
 q3_options_count = [0,0,0,0,0,0]
 
 # split the data
-q3_clean = df["Q3: In what setting would you expect this food to be served? Please check all that apply"].str.split(',')
+q3_clean = df["Q3: In what setting would you expect this food to be served? Please check all that apply"].fillna('').str.split(',')
 
 # we are calcuating the mode so start all values at 0
 for c in q3_choices:
@@ -94,31 +131,13 @@ for c in q3_choices:
 
 for i, choice in q3_clean.items():
     # skip missing values (if choice is null and if its equal)
-    if choice is not None and choice == choice:
-        # convert the str to a list for easier iteration
-        if isinstance(choice, str):
-            choice = [choice]
-        
-        # split the input by the ","
-        for i in range(len(choice)):
-            curr_i = choice[i].split(',')
-            
-            # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
-            for c in curr_i:
-                if c in q3_choices:
-                    df[i, c] = 1
-                    if c == 'Week day lunch':
-                        q3_options_count[0] += 1
-                    elif c == 'Week day dinner':
-                        q3_options_count[1] += 1
-                    elif c == 'Weekend lunch':
-                        q3_options_count[2] += 1
-                    elif c == 'Weekend dinner':
-                        q3_options_count[3] += 1
-                    elif c == 'At a party':
-                        q3_options_count[4] += 1
-                    elif c == 'Late night snack':
-                        q3_options_count[5] += 1
+    if choice is not None:
+        # iterate through each choice
+        for c in choice:
+            c = c.strip()
+            if c in q3_choices:
+                df.at[i, c] = 1
+                q3_options_count[q3_choices.index(c)] += 1
 
 # next check to see if each choice is present more than 50% of the time and convert it into a vector
 half_length = len(df) / 2
@@ -205,10 +224,33 @@ df['Q4: How much would you expect to pay for one serving of this food item?'] = 
 median_q4 = df['Q4: How much would you expect to pay for one serving of this food item?'].median()
 df['Q4: How much would you expect to pay for one serving of this food item?'] = df['Q4: How much would you expect to pay for one serving of this food item?'].fillna(median_q4)
 
+# Compute mean and standard deviation for Z-score normalization
+mean_q4 = df['Q4: How much would you expect to pay for one serving of this food item?'].mean()
+std_q4 = df['Q4: How much would you expect to pay for one serving of this food item?'].std()
 
+# Apply Z-score normalization manually
+df['Q4: How much would you expect to pay for one serving of this food item?'] = (df['Q4: How much would you expect to pay for one serving of this food item?'] - mean_q4) / std_q4
+
+# Print the first few rows to check the results
+# print(df[['Q4: How much would you expect to pay for one serving of this food item?']].head())
 #####################################################################################################################
 #### Q5 ####
 q5 = "Q5: What movie do you think of when thinking of this food item?"
+
+df[q5] = (
+    df[q5]
+    .astype(str)                            # Ensure the column is string type
+    .str.strip()                            # remove leading and trailing whitespace
+    .str.lower()                            # Convert to lowercase
+    .str.replace("'", "", regex=False)      # Remove apostrophes
+    .str.replace("\n", " ", regex=False)    # Replace newlines with space
+    .str.replace("-", " ", regex=False)     # Replace hyphens with space
+    .str.replace(r"\(.*?\)", "", regex=True) # Remove anything inside parentheses
+    .str.replace(r"[^a-zA-Z0-9 ]", "", regex=True)  # Keep only alphanumeric characters and spaces
+    .str.replace(r"\s+", " ", regex=True)    # Replace multiple spaces with a single space
+    .replace(r"^\s*$", "unknown", regex=True)  # Replace empty strings with 'without'
+)
+
 
 vocab = set()
 for row in df[q5]:
@@ -231,10 +273,11 @@ for index, row in df[q5].items():
     word_counts = {word: row.split().count(word) for word in vocab}
     bag_of_words_df = bag_of_words_df._append(word_counts, ignore_index=True)
 
-bag_of_words_df[label_column] = df[label_column]
+# bag_of_words_df[label_column] = df[label_column]
 
 # Save the bag of words with frequencies to a CSV
 # bag_of_words_df.to_csv(clean_data_path, index=False)
+bag_of_words_df.insert(0, 'ID', df['id'].values)  # Insert 'id' as the first column
 
 
 
@@ -281,7 +324,11 @@ for i, words in enumerate(tokenized_texts):
 
 # Convert to DataFrame (same format as CountVectorizer)
 bow_df = pd.DataFrame(bow_matrix, columns=vocab)
-bow_df[label_col] = df[label_col]
+# bow_df[label_col] = df[label_col]
+# Ensure 'id' column is available in the original dataset
+# print("Existing columns in bow_df:", bow_df.columns.tolist())
+
+bow_df.insert(0, 'ID', df['id'].values)  # Insert 'id' as the first column
 
 # print(len(bow_df))
 
@@ -294,37 +341,21 @@ q7_choices = ['Parents', 'Siblings', 'Friends', 'Teachers', 'Strangers']
 q7_options_count = [0,0,0,0,0]
 
 # split the data
-q7_clean = df["Q7: When you think about this food item, who does it remind you of?"].str.split(',')
+q7_clean = df["Q7: When you think about this food item, who does it remind you of?"].fillna('').str.split(',')
 
 # we are calcuating the mode so start all values at 0
 for c in q7_choices:
     df[c] = 0  
 
 for i, choice in q7_clean.items():
-    # skip missing values (if choice is null and if its equal)
-    if choice is not None and choice == choice:
-        # convert the str to a list for easier iteration
-        if isinstance(choice, str):
-            choice = [choice]
-        
-        # split the input by the ","
-        for i in range(len(choice)):
-            curr_i = choice[i].split(',')
-            
-            # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
-            for c in curr_i:
-                if c in q7_choices:
-                    df[i, c] = 1
-                    if c == 'Parents':
-                        q7_options_count[0] += 1
-                    elif c == 'Siblings':
-                        q7_options_count[1] += 1
-                    elif c == 'Friends':
-                        q7_options_count[2] += 1
-                    elif c == 'Teachers':
-                        q7_options_count[3] += 1
-                    elif c == 'Strangers':
-                        q7_options_count[4] += 1
+    # skip missing values (if choice is empty)
+    if choice:
+        # iterate through each choice
+        for c in choice:
+            c = c.strip()
+            if c in q7_choices:
+                df.at[i, c] = 1
+                q7_options_count[q7_choices.index(c)] += 1
 
 # next check to see if each choice is present more than 50% of the time and convert it into a vector
 half_length = len(df) / 2
@@ -356,7 +387,7 @@ for index, row in df["Q7: When you think about this food item, who does it remin
 # print(df)
 
 # remove the data                
-df = df.drop("Q7: When you think about this food item, who does it remind you of?", axis=1)
+# df = df.drop("Q7: When you think about this food item, who does it remind you of?", axis=1)
 
 
 ###########################################################################
@@ -367,36 +398,20 @@ q8_choices = ['None', 'A little (mild)', 'A moderate amount (medium)', 'A lot (h
 q8_options_count = [0,0,0,0,0]
 
 # get the data
-q8_clean = df["Q8: How much hot sauce would you add to this food item?"]
+q8_clean = df["Q8: How much hot sauce would you add to this food item?"].fillna('')
 
 # we are calcuating the mode so start all values at 0
 for c in q8_choices:
     df[c] = 0  
 
+# One-hot encode the choices
 for i, choice in q8_clean.items():
-    # skip missing values (if choice is null and if its equal)
-    if choice is not None and choice == choice:
-        # convert the str to a list for easier iteration
-        if isinstance(choice, str):
-            choice = [choice]
-        
-        for i in range(len(choice)):
-            curr_i = choice[i]
-            
-            # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
-            for c in curr_i:
-                if c in q8_choices:
-                    df[i, c] = 1
-                    if c == 'None':
-                        q8_options_count[0] += 1
-                    elif c == 'A little (mild)':
-                        q8_options_count[1] += 1
-                    elif c == 'A moderate amount (medium)':
-                        q8_options_count[2] += 1
-                    elif c == 'A lot (hot)':
-                        q8_options_count[3] += 1
-                    elif c == 'I will have some of this food item with my hot sauce':
-                        q8_options_count[4] += 1
+    if choice in q8_choices:
+        df.at[i, choice] = 1
+        q8_options_count[q8_choices.index(choice)] += 1
+    else: 
+        df.at[i, 'None'] = 1
+        q8_options_count[q8_choices.index('None')] += 1
 
 # next check to see which option was the most frequent
 most_freq = max(q8_options_count)
@@ -411,9 +426,6 @@ for i in range(len(q8_choices)):
     else: # otherwise set vector value to 0
         choices_one_hot[choice] = 0
 
-print("Original DataFrame:")
-print(df)
-
 # next fill in any value that are missing based on the one-hot vector/most frequent above.
 for index, row in df["Q8: How much hot sauce would you add to this food item?"].items():
     if pd.isnull(row):
@@ -424,8 +436,52 @@ for index, row in df["Q8: How much hot sauce would you add to this food item?"].
         df.at[index, 'A lot (hot)'] = choices_one_hot['A lot (hot)'] 
         df.at[index, 'I will have some of this food item with my hot sauce'] = choices_one_hot['I will have some of this food item with my hot sauce'] 
 
-print("\nDataFrame after filling missing values:")
-print(df)
+# print("\nDataFrame after filling missing values:")
+# print(df)
 
 # remove the data                
-df = df.drop("Q8: How much hot sauce would you add to this food item?", axis=1)
+# df = df.drop("Q8: How much hot sauce would you add to this food item?", axis=1)
+
+# df[['None', 'A little (mild)', 'A moderate amount (medium)', 'A lot (hot)', 'I will have some of this food item with my hot sauce']].to_csv(cleaned_data_path, index=False)
+
+###############################################################################
+################### Final combine ###################
+
+col1 = 'Q1: From a scale 1 to 5, how complex is it to make this food? \
+(Where 1 is the most simple, and 5 is the most complex)'
+
+col2 = 'Q2: How many ingredients would you expect this food item to contain?'
+col31 = 'Week day lunch' 
+col32 ='Week day dinner' 
+col33 ='Weekend lunch' 
+col34 ='Weekend dinner'
+col35 ='At a party'
+col36 ='Late night snack'
+col4 = 'Q4: How much would you expect to pay for one serving of this food item?'
+# col5 = "Q5: What movie do you think of when thinking of this food item?"
+# col6 = "Q6: What drink would you pair with this food item?"
+
+col71 = 'Parents'
+col72 = 'Siblings'
+col73 = 'Friends'
+col74 = 'Teachers'
+col75 = 'Strangers'
+
+col81 ='None'
+col82 ='A little (mild)'
+col83 ='A moderate amount (medium)' 
+col84 ='A lot (hot)' 
+col85 ='I will have some of this food item with my hot sauce'
+
+
+# df_selected = df[selected_columns]  # Extract only the required columns
+
+# Combine all DataFrames row-wise
+# final_combined_df = pd.concat([bag_of_words_df, bow_df, df[[col1, col2, col31,col32,col33,col34,col35,col36, col4, col71,col72,col73,col74,col75, col81, col82, col83, col84,col85, label_col]]], axis=0, ignore_index=True)
+
+# final_combined_df.to_csv(clean_data_path, index=False)
+df.rename(columns={'id': 'ID'}, inplace=True)  # Rename 'id' to 'ID'
+
+df[['ID', col1, col2, col31,col32,col33,col34,col35,col36, col4, col71,col72,col73,col74,col75, col81, col82, col83, col84,col85,label_col]].to_csv(clean_data_path, index=False)
+bag_of_words_df.to_csv(vocabQ5, index=False)
+bow_df.to_csv(vocabQ6, index=False)

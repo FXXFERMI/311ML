@@ -21,13 +21,16 @@ import pickle as pk
 data_path = './cleaned_data_combined.csv'
 df = pd.read_csv(data_path)
 
+cleaned_data_path = './clean data/Q3_clean.csv'
+
+
 # options that can be chosen
 q3_choices = ['Week day lunch', 'Week day dinner', 'Weekend lunch', 'Weekend dinner','At a party', 'Late night snack']
 # this correcsponds to the number of times each option was chosen
 q3_options_count = [0,0,0,0,0,0]
 
 # split the data
-q3_clean = df["Q3: In what setting would you expect this food to be served? Please check all that apply"].str.split(',')
+q3_clean = df["Q3: In what setting would you expect this food to be served? Please check all that apply"].fillna('').str.split(',')
 
 # we are calcuating the mode so start all values at 0
 for c in q3_choices:
@@ -35,31 +38,13 @@ for c in q3_choices:
 
 for i, choice in q3_clean.items():
     # skip missing values (if choice is null and if its equal)
-    if choice is not None and choice == choice:
-        # convert the str to a list for easier iteration
-        if isinstance(choice, str):
-            choice = [choice]
-        
-        # split the input by the ","
-        for i in range(len(choice)):
-            curr_i = choice[i].split(',')
-            
-            # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
-            for c in curr_i:
-                if c in q3_choices:
-                    df[i, c] = 1
-                    if c == 'Week day lunch':
-                        q3_options_count[0] += 1
-                    elif c == 'Week day dinner':
-                        q3_options_count[1] += 1
-                    elif c == 'Weekend lunch':
-                        q3_options_count[2] += 1
-                    elif c == 'Weekend dinner':
-                        q3_options_count[3] += 1
-                    elif c == 'At a party':
-                        q3_options_count[4] += 1
-                    elif c == 'Late night snack':
-                        q3_options_count[5] += 1
+    if choice is not None:
+        # iterate through each choice
+        for c in choice:
+            c = c.strip()
+            if c in q3_choices:
+                df.at[i, c] = 1
+                q3_options_count[q3_choices.index(c)] += 1
 
 # next check to see if each choice is present more than 50% of the time and convert it into a vector
 half_length = len(df) / 2
@@ -92,4 +77,6 @@ for index, row in df["Q3: In what setting would you expect this food to be serve
 # print(df)
 
 # remove the data                
-df = df.drop("Q3: In what setting would you expect this food to be served? Please check all that apply", axis=1)
+# df = df.drop("Q3: In what setting would you expect this food to be served? Please check all that apply", axis=1)
+
+df[['Week day lunch', 'Week day dinner', 'Weekend lunch', 'Weekend dinner','At a party', 'Late night snack']].to_csv(cleaned_data_path, index=False)

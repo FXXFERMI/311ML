@@ -26,36 +26,20 @@ q8_choices = ['None', 'A little (mild)', 'A moderate amount (medium)', 'A lot (h
 q8_options_count = [0,0,0,0,0]
 
 # get the data
-q8_clean = df["Q8: How much hot sauce would you add to this food item?"]
+q8_clean = df["Q8: How much hot sauce would you add to this food item?"].fillna('')
 
 # we are calcuating the mode so start all values at 0
 for c in q8_choices:
     df[c] = 0  
 
+# One-hot encode the choices
 for i, choice in q8_clean.items():
-    # skip missing values (if choice is null and if its equal)
-    if choice is not None and choice == choice:
-        # convert the str to a list for easier iteration
-        if isinstance(choice, str):
-            choice = [choice]
-        
-        for i in range(len(choice)):
-            curr_i = choice[i]
-            
-            # check if the current input's is in q3_choice and increase the count of that specific choice. Also, increase the overall option count
-            for c in curr_i:
-                if c in q8_choices:
-                    df[i, c] = 1
-                    if c == 'None':
-                        q8_options_count[0] += 1
-                    elif c == 'A little (mild)':
-                        q8_options_count[1] += 1
-                    elif c == 'A moderate amount (medium)':
-                        q8_options_count[2] += 1
-                    elif c == 'A lot (hot)':
-                        q8_options_count[3] += 1
-                    elif c == 'I will have some of this food item with my hot sauce':
-                        q8_options_count[4] += 1
+    if choice in q8_choices:
+        df.at[i, choice] = 1
+        q8_options_count[q8_choices.index(choice)] += 1
+    else: 
+        df.at[i, 'None'] = 1
+        q8_options_count[q8_choices.index('None')] += 1
 
 # next check to see which option was the most frequent
 most_freq = max(q8_options_count)
@@ -69,9 +53,6 @@ for i in range(len(q8_choices)):
         choices_one_hot[choice] = 1
     else: # otherwise set vector value to 0
         choices_one_hot[choice] = 0
-
-print("Original DataFrame:")
-print(df)
 
 # next fill in any value that are missing based on the one-hot vector/most frequent above.
 for index, row in df["Q8: How much hot sauce would you add to this food item?"].items():
@@ -88,3 +69,6 @@ print(df)
 
 # remove the data                
 df = df.drop("Q8: How much hot sauce would you add to this food item?", axis=1)
+
+cleaned_data_path = 'clean data/Q8_clean.csv'
+df[['None', 'A little (mild)', 'A moderate amount (medium)', 'A lot (hot)', 'I will have some of this food item with my hot sauce']].to_csv(cleaned_data_path, index=False)
