@@ -56,7 +56,7 @@ def get_numbers(text):
 
 def clean_text(text):
     if isinstance(text, str):
-        text_str = text.replace('\n', '').replace(',', '').replace(':', '')
+        text_str = text.replace('\n', ' ').replace(',', ' ').replace(':', ' ').replace('.', ' ')
         return text_str
     else:
         return 'null'
@@ -69,5 +69,5 @@ df['Q2: How many ingredients would you expect this food item to contain?'] = df[
 median_q2 = df['Q2: How many ingredients would you expect this food item to contain?'].median()
 df['Q2: How many ingredients would you expect this food item to contain?'] = df['Q2: How many ingredients would you expect this food item to contain?'].fillna(median_q2)
 
-df['Q2: How many ingredients would you expect this food item to contain?'].to_csv(clean_data_path, index=False)
+df[['id','Q2: How many ingredients would you expect this food item to contain?']].to_csv(clean_data_path, index=False)
 
