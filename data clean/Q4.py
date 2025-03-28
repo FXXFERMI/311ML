@@ -23,20 +23,42 @@ def convert_numbers(text):
     for token in text.split():
         # Handle number ranges like "7 to 8" or "7-8"
         if "to" in token or "-" in token:
-            range_values = [float(val) for val in re.split(r"[-\s]", token) if val.isdigit()]
+            range_values = [float(val) for val in re.split(r"[-\s]", token) if val.replace('.', '', 1).isdigit()]
             if len(range_values) == 2:
-                words.append(str(round(np.mean(range_values), 2)))  # Convert range to its mean
+                words.append(str(int(np.mean(range_values))))  # Convert range to its mean and handle as int
         elif token.replace('.', '', 1).isdigit():
             if token.endswith(".00"):
-                words.append(str(int(float(token))))
-            else: 
-                words.append(token)
+                words.append(str(int(float(token))))  # Convert decimal to integer (cent-wise)
+            else:
+                words.append(str(int(float(token))))  # Convert decimal to integer (cent-wise)
         elif token.isdigit():
             words.append(token)  # Keep numbers as words
         else:
             words.append(token)  # Keep normal words
 
     return " ".join(words) if words else "unknown"
+
+# df[q4] = df[q4].astype(str).apply(convert_numbers)
+
+df[q4] = (
+    df[q4]
+    .astype(str)                            # Ensure the column is string type
+    .str.strip()                            # Remove leading and trailing whitespace
+    .str.lower()                            # Convert to lowercase
+    .str.replace("'", " ", regex=False)      # Remove apostrophes
+    .str.replace("\n", " ", regex=False)    # Replace newlines with space
+    .str.replace("-", " ", regex=False)     # Replace hyphens with space
+    .str.replace("~", " ", regex=False)     # Replace hyphens with space
+    .str.replace("cad", " ", regex=False)     # Replace cad with space
+    .str.replace("ish", " ", regex=False)     # Replace ish with space
+    .str.replace("usd", " ", regex=False)     # Replace usd with space
+    .str.replace("dollars", " ", regex=False)     # Replace dollar with space
+    .str.replace("dollar", " ", regex=False)     # Replace dollars with space
+    .str.replace(r"\(.*?\)", "", regex=True) # Remove anything inside parentheses
+    .str.replace(r"[^a-zA-Z0-9. ]", "", regex=True)  # Keep only alphanumeric characters, decimal numbers, and spaces
+    .str.replace(r"\s+", " ", regex=True)    # Replace multiple spaces with a single space
+    .replace(r"^\s*$", "unknown", regex=True)  # Replace empty strings with 'unknown'
+)
 
 df[q4] = df[q4].astype(str).apply(convert_numbers)
 
@@ -45,18 +67,16 @@ df[q4] = (
     .astype(str)                            # Ensure the column is string type
     .str.strip()                            # Remove leading and trailing whitespace
     .str.lower()                            # Convert to lowercase
-    .str.replace("'", "", regex=False)      # Remove apostrophes
-    .str.replace("\n", " ", regex=False)    # Replace newlines with space
-    .str.replace("-", " ", regex=False)     # Replace hyphens with space
-    .str.replace(r"\(.*?\)", "", regex=True) # Remove anything inside parentheses
-    .str.replace(r"[^a-zA-Z0-9. ]", "", regex=True)  # Keep only alphanumeric characters, decimal numbers, and spaces
-    .str.replace(r"\s+", " ", regex=True)    # Replace multiple spaces with a single space
-    .replace(r"^\s*$", "unknown", regex=True)  # Replace empty strings with 'unknown'
+    .str.replace(".", "", regex=False)      # Remove apostrophes
 )
-
     
 
 print(df[['id',q4]])
+# pd.set_option('display.max_colwidth', None)  # Ensure full text is displayed
+
+# print(df[df['id'] == 715814][['id', q4]])
+
+
 
 
 vocab = set()
