@@ -5,7 +5,8 @@ import random
 import numpy as np
 import pandas as pd
 
-pd.set_option('display.max_rows', 1650)  # Adjust the number as needed
+pd.set_option('display.max_rows', 3000)  # Adjust the number as needed
+pd.set_option('display.max_colwidth', None)  # Ensure full text is displayed
 
 #### Import Data ####
 # Load the dataset
@@ -32,7 +33,7 @@ def convert_numbers(text):
 
     return " ".join(words) if words else "unknown"
 
-df[q2] = df[q2].astype(str).apply(convert_numbers)
+# df[q2] = df[q2].astype(str).apply(convert_numbers)
 
 df[q2] = (
     df[q2]
@@ -41,14 +42,27 @@ df[q2] = (
     .str.lower()                            # Convert to lowercase
     .str.replace("'", "", regex=False)      # Remove apostrophes
     .str.replace("\n", " ", regex=False)    # Replace newlines with space
-    .str.replace("-", " ", regex=False)     # Replace hyphens with space
+    .str.replace("~", " ", regex=False)     # Replace hyphens with space
+    .str.replace("/", " ", regex=False)    # Replace slash with space
     .str.replace(r"\(.*?\)", "", regex=True) # Remove anything inside parentheses
-    .str.replace(r"[^a-zA-Z0-9. ]", "", regex=True)  # Keep only alphanumeric characters, decimal numbers, and spaces
+    .str.replace(r"(\d) (\bto\b) (\d)", r"\1-\3", regex=True)
+    .str.replace(r"[^a-zA-Z0-9.\- ]", "", regex=True)
     .str.replace(r"\s+", " ", regex=True)    # Replace multiple spaces with a single space
     .replace(r"^\s*$", "unknown", regex=True)  # Replace empty strings with 'unknown'
 )
 
-print(df[['id',q2]])
+df[q2] = df[q2].astype(str).apply(convert_numbers)
+
+df[q2] = (
+    df[q2]
+    .astype(str)                            # Ensure the column is string type
+    .str.strip()                            # Remove leading and trailing whitespace
+    .str.lower()                            # Convert to lowercase
+    .str.replace(".", "", regex=False)      # Remove apostrophes
+)
+
+# print(df[['id',q2]])
+print(df[df['id'] == 617542][['id', q2]])
 
 vocab = set()
 for row in df[q2]:

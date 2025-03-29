@@ -48,14 +48,15 @@ df[q4] = (
     .str.lower()                            # Convert to lowercase
     .str.replace("'", "", regex=False)      # Remove apostrophes
     .str.replace("\n", " ", regex=False)    # Replace newlines with space
-    .str.replace("-", " ", regex=False)     # Replace hyphens with space
+    .str.replace("/", " ", regex=False)    # Replace slash with space
     .str.replace("~", " ", regex=False)     # Replace hyphens with space
     .str.replace("cad", " ", regex=False)     # Replace cad with space
     .str.replace("usd", " ", regex=False)     # Replace usd with space
     .str.replace("dollars", " ", regex=False)     # Replace dollar with space
     .str.replace("dollar", " ", regex=False)     # Replace dollars with space
     .str.replace(r"\(.*?\)", "", regex=True) # Remove anything inside parentheses
-    .str.replace(r"[^a-zA-Z0-9. ]", "", regex=True)  # Keep only alphanumeric characters, decimal numbers, and spaces
+    .str.replace(r"(\d) (\bto\b) (\d)", r"\1-\3", regex=True)
+    .str.replace(r"[^a-zA-Z0-9.\- ]", "", regex=True)
     .str.replace(r"\s+", " ", regex=True)    # Replace multiple spaces with a single space
     .replace(r"^\s*$", "unknown", regex=True)  # Replace empty strings with 'unknown'
 )
