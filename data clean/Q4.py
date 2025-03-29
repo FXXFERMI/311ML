@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import re
 pd.set_option('display.max_rows', 1650)  # Adjust the number as needed
+pd.set_option('display.max_colwidth', None)  # Ensure full text is displayed
 
 #### Import Data ####
 # Load the dataset
@@ -45,12 +46,11 @@ df[q4] = (
     .astype(str)                            # Ensure the column is string type
     .str.strip()                            # Remove leading and trailing whitespace
     .str.lower()                            # Convert to lowercase
-    .str.replace("'", " ", regex=False)      # Remove apostrophes
+    .str.replace("'", "", regex=False)      # Remove apostrophes
     .str.replace("\n", " ", regex=False)    # Replace newlines with space
     .str.replace("-", " ", regex=False)     # Replace hyphens with space
     .str.replace("~", " ", regex=False)     # Replace hyphens with space
     .str.replace("cad", " ", regex=False)     # Replace cad with space
-    .str.replace("ish", " ", regex=False)     # Replace ish with space
     .str.replace("usd", " ", regex=False)     # Replace usd with space
     .str.replace("dollars", " ", regex=False)     # Replace dollar with space
     .str.replace("dollar", " ", regex=False)     # Replace dollars with space
@@ -72,7 +72,7 @@ df[q4] = (
     
 
 print(df[['id',q4]])
-# pd.set_option('display.max_colwidth', None)  # Ensure full text is displayed
+
 
 # print(df[df['id'] == 715814][['id', q4]])
 
