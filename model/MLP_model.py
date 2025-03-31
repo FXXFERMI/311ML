@@ -49,8 +49,8 @@ for fold, (train_idx, val_idx) in enumerate(cv.split(train_data)):
     X_valid_fold = scaler.transform(X_valid_fold)
 
     # Initialize MLP model
-    model = MLPClassifier(hidden_layer_sizes=(128, 64), activation='relu', solver='adam',
-                          alpha=0.0001, max_iter=500, random_state=18)
+    model = MLPClassifier(hidden_layer_sizes=(64, 32), activation='relu', solver='adam',
+                          alpha=0.001, max_iter=500, random_state=18)
 
     # Train the model
     model.fit(X_train_fold, y_train_fold)

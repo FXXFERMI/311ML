@@ -124,11 +124,11 @@ if not os.path.exists(weights_dir):
     os.makedirs(weights_dir)
 
 # ✅ Save best model weights to CSV files
-pd.DataFrame(best_weights['W1']).to_csv(f'{weights_dir}best_W1.csv', index=False, header=False)
-pd.DataFrame(best_weights['b1']).to_csv(f'{weights_dir}best_b1.csv', index=False, header=False)
-pd.DataFrame(best_weights['W2']).to_csv(f'{weights_dir}best_W2.csv', index=False, header=False)
-pd.DataFrame(best_weights['b2']).to_csv(f'{weights_dir}best_b2.csv', index=False, header=False)
-pd.DataFrame(best_weights['W3']).to_csv(f'{weights_dir}best_W3.csv', index=False, header=False)
-pd.DataFrame(best_weights['b3']).to_csv(f'{weights_dir}best_b3.csv', index=False, header=False)
+pd.DataFrame(best_weights['W1']).to_csv(f'{weights_dir}best_W1_3.csv', index=False, header=False)
+pd.DataFrame(best_weights['b1']).to_csv(f'{weights_dir}best_b1_3.csv', index=False, header=False)
+pd.DataFrame(best_weights['W2']).to_csv(f'{weights_dir}best_W2_3.csv', index=False, header=False)
+pd.DataFrame(best_weights['b2']).to_csv(f'{weights_dir}best_b2_3.csv', index=False, header=False)
+pd.DataFrame(best_weights['W3']).to_csv(f'{weights_dir}best_W3_3.csv', index=False, header=False)
+pd.DataFrame(best_weights['b3']).to_csv(f'{weights_dir}best_b3_3.csv', index=False, header=False)
 
 print("\n✅ Best model weights stored as CSV files!")
