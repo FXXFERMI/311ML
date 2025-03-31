@@ -6,16 +6,14 @@ import pandas as pd
 
 #### Import Data ####
 # Load the dataset
-data_path = './dataset/train.csv'
+data_path = './Heart_Broken/dataset/train.csv'
 df = pd.read_csv(data_path)
 
 label_col = "Label" 
 
-clean_data_path = './dataset/train_dataset.csv'
-vocabQ2 = './dataset/vocabQ2.csv'
-vocabQ4 = './dataset/vocabQ4.csv'
-vocabQ5 = './dataset/vocabQ5.csv'
-vocabQ6 = './dataset/vocabQ6.csv'
+clean_data_path = './Heart_Broken/dataset/train_dataset.csv'
+vocabQ5 = './Heart_Broken/dataset/vocabQ5.csv'
+vocabQ6 = './Heart_Broken/dataset/vocabQ6.csv'
 
 
 #####################################################################################################################
@@ -485,3 +483,12 @@ df.rename(columns={'id': 'ID'}, inplace=True)  # Rename 'id' to 'ID'
 df[['ID', col1, col2, col31,col32,col33,col34,col35,col36, col4, col71,col72,col73,col74,col75, col81, col82, col83, col84,col85,label_col]].to_csv(clean_data_path, index=False)
 bag_of_words_df.to_csv(vocabQ5, index=False)
 bow_df.to_csv(vocabQ6, index=False)
+
+# Drop 'ID' and 'label_col' from df
+df_filtered = df[['ID',col1, col2, col31,col32,col33,col34,col35,col36, col4, col71,col72,col73,col74,col75, col81, col82, col83, col84,col85, label_col]]
+
+# Concatenate DataFrames
+combined_df = pd.concat([df_filtered, bag_of_words_df, bow_df], axis=1)
+
+# Save to CSV
+combined_df.to_csv('./Heart_Broken/dataset/cleaned_train_dataset_wo_BoW.csv', index=False)

@@ -12,11 +12,11 @@ df = pd.read_csv(data_path)
 
 label_col = "Label" 
 
-clean_data_path = './dataset/train_dataset.csv'
-vocabQ2 = './dataset/vocabQ2.csv'
-vocabQ4 = './dataset/vocabQ4.csv'
-vocabQ5 = './dataset/vocabQ5.csv'
-vocabQ6 = './dataset/vocabQ6.csv'
+clean_data_path = './Heart_Broken/dataset/train_dataset.csv'
+vocabQ2 = './Heart_Broken/dataset/vocabQ2.csv'
+vocabQ4 = './Heart_Broken/dataset/vocabQ4.csv'
+vocabQ5 = './Heart_Broken/dataset/vocabQ5.csv'
+vocabQ6 = './Heart_Broken/dataset/vocabQ6.csv'
 
 
 #####################################################################################################################
