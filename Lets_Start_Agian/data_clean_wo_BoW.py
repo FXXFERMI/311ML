@@ -100,7 +100,7 @@ def process_clean_data(filename):
     df[col_name_q2] = (df[col_name_q2] - mean_q2) / std_q2
 
     # Apply Z-score normalization manually
-    clean_data = pd.concat([clean_data, df[col_name_q2]], axis=1)
+    clean_data[col_name_q2] = df[col_name_q2]
 
     ############################################################################
     #### Q3 ####
@@ -225,8 +225,8 @@ def process_clean_data(filename):
     df[col_name_q4] = (df[col_name_q4] - mean_q4) / std_q4
 
     # Apply Z-score normalization manually
-    clean_data = pd.concat([clean_data, df[col_name_q4]], axis=1)
-
+    # clean_data = pd.concat([clean_data, df[col_name_q4]], axis=1)
+    clean_data[col_name_q4] = df[col_name_q4]
 
     #####################################################################################################################
     #### Q5 ####

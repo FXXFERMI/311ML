@@ -6,7 +6,7 @@ from data_clean_wo_BoW import process_clean_data
 # === Set paths ===
 base_dir = os.path.dirname(__file__)
 
-raw_test_path = os.path.join(base_dir, "test_dataset.csv")
+raw_test_path = os.path.join(base_dir, "test_dataset2.csv")
 test_data = pd.read_csv(raw_test_path)
 
 # === Get predictions ===
